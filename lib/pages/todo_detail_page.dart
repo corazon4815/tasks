@@ -3,7 +3,6 @@ import '/models/todo_entity.dart';
 
 class ToDoDetailPage extends StatefulWidget {
   final ToDoEntity todo;
-
   const ToDoDetailPage({super.key, required this.todo});
 
   @override
@@ -33,74 +32,102 @@ class _ToDoDetailPageState extends State<ToDoDetailPage> {
 
   @override
   Widget build(BuildContext context) {
- 
-    return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (didPop, result) {
-        if (didPop) return;
-        Navigator.of(context).pop<ToDoEntity>(_current); // 결과와 함께 직접 pop
-      },
-      child: Scaffold(
-        backgroundColor: const Color(0xFFB9B9B9),
-        appBar: AppBar(
-          backgroundColor: const Color(0xFFE0E0E0),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () => Navigator.of(context).pop<ToDoEntity>(_current),
-          ),
-          actions: [
-            IconButton(
-              onPressed: _toggleFavorite,
-              icon: Icon(_current.isFavorite ? Icons.star : Icons.star_border),
+    const colorSeed = Color(0xFF6750A4);
+    final base = Theme.of(context);
+    final scheme = ColorScheme.fromSeed(
+      seedColor: colorSeed,
+      brightness: base.brightness,
+    );
+
+    final localTheme = base.copyWith(
+      colorScheme: scheme,
+      scaffoldBackgroundColor: scheme.surface,
+      appBarTheme: base.appBarTheme.copyWith(
+        backgroundColor: scheme.surface,
+        foregroundColor: scheme.onSurface,
+        centerTitle: true,
+        elevation: 0,
+        surfaceTintColor: Colors.transparent,
+      ),
+      iconTheme: base.iconTheme.copyWith(color: scheme.onSurfaceVariant),
+      cardTheme: base.cardTheme.copyWith(
+        color: scheme.surfaceContainerHighest,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    );
+
+    return Theme(
+      data: localTheme,
+      child: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) {
+          if (didPop) return;
+          Navigator.of(context).pop<ToDoEntity>(_current);
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () => Navigator.of(context).pop<ToDoEntity>(_current),
             ),
-          ],
-        ),
-        body: Padding(
-          padding: const EdgeInsets.all(20),
-          child: ListView(
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      _current.title,
-                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            decoration: _current.isDone
-                                ? TextDecoration.lineThrough
-                                : TextDecoration.none,
-                          ),
-                    ),
-                  ),
-                ],
+            actions: [
+              IconButton(
+                onPressed: _toggleFavorite,
+                icon: Icon(
+                  _current.isFavorite ? Icons.star : Icons.star_border,
+                ),
+                color: _current.isFavorite ? scheme.secondary : scheme.onSurface,
+                tooltip: '즐겨찾기',
               ),
-              const SizedBox(height: 16),
-              if ((_current.description ?? '').isNotEmpty)
+            ],
+          ),
+          body: Padding(
+            padding: const EdgeInsets.all(20),
+            child: ListView(
+              children: [
                 Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(Icons.short_text_rounded, size: 24),
-                    const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        _current.description!,
-                        style: Theme.of(context).textTheme.bodyLarge,
+                        _current.title,
+                        style: base.textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          decoration:
+                              _current.isDone ? TextDecoration.lineThrough : null,
+                        ),
                       ),
                     ),
                   ],
-                )
-              else
-                Text(
-                  '세부 내용이 없습니다.',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
                 ),
-            ],
+                const SizedBox(height: 16),
+                if ((_current.description ?? '').isNotEmpty)
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(Icons.short_text_rounded, size: 24),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          _current.description!,
+                          style: base.textTheme.bodyLarge,
+                        ),
+                      ),
+                    ],
+                  )
+                else
+                  Text(
+                    '세부 내용이 없습니다.',
+                    style: base.textTheme.bodyMedium?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
       ),
     );
-
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tasks/core/theme_action.dart';
 import 'pages/home_page.dart';
 
 void main() {
@@ -14,34 +15,57 @@ class TasksApp extends StatefulWidget {
 
 class _TasksAppState extends State<TasksApp> {
   ThemeMode _themeMode = ThemeMode.light;
-
-  void _toggleThemeMode() {
-    setState(() {
-      _themeMode =
-          _themeMode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
-    });
-  }
+  void _toggleThemeMode() => setState(() {
+    _themeMode = _themeMode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
+  });
 
   @override
   Widget build(BuildContext context) {
-    final colorSeed = const Color(0xFF6750A4);
+    const colorSeed = Color(0xFF6750A4);
+
+    ThemeData buildTheme(Brightness brightness) {
+      final scheme = ColorScheme.fromSeed(
+        seedColor: colorSeed,
+        brightness: brightness,
+      );
+      return ThemeData(
+        useMaterial3: true,
+        colorScheme: scheme,
+        scaffoldBackgroundColor: scheme.surface,
+        appBarTheme: const AppBarTheme(
+          centerTitle: true,
+          surfaceTintColor: Colors.transparent,
+          elevation: 0,
+        ),
+        cardColor: scheme.surfaceVariant,
+        cardTheme: CardThemeData(
+          color: scheme.surfaceVariant,
+          elevation: 0,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+        listTileTheme: ListTileThemeData(iconColor: scheme.onSurfaceVariant),
+        floatingActionButtonTheme: FloatingActionButtonThemeData(
+          backgroundColor: scheme.primary,
+          foregroundColor: scheme.onPrimary,
+          shape: const CircleBorder(),
+        ),
+        bottomSheetTheme: BottomSheetThemeData(
+          backgroundColor: scheme.surface,
+          surfaceTintColor: Colors.transparent,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+          ),
+        ),
+      );
+    }
 
     return MaterialApp(
       title: 'tasks',
       debugShowCheckedModeBanner: false,
       themeMode: _themeMode,
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(seedColor: colorSeed),
-        appBarTheme: const AppBarTheme(centerTitle: true),
-      ),
-      darkTheme: ThemeData(
-        useMaterial3: true,
-        colorScheme:
-            ColorScheme.fromSeed(seedColor: colorSeed, brightness: Brightness.dark),
-        appBarTheme: const AppBarTheme(centerTitle: true),
-      ),
-      home: _ThemeAction(
+      theme: buildTheme(Brightness.light),
+      darkTheme: buildTheme(Brightness.dark),
+      home: ThemeAction(
         toggleThemeMode: _toggleThemeMode,
         child: const HomePage(studentName: '수진'),
       ),
@@ -49,20 +73,3 @@ class _TasksAppState extends State<TasksApp> {
   }
 }
 
-/// HomePage에서 테마 토글을 호출하기 위해 import
-class _ThemeAction extends InheritedWidget {
-  final VoidCallback? toggleThemeMode;
-
-  const _ThemeAction({
-    required super.child,
-    this.toggleThemeMode,
-  });
-
-  static _ThemeAction? of(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<_ThemeAction>();
-  }
-
-  @override
-  bool updateShouldNotify(_ThemeAction oldWidget) =>
-      toggleThemeMode != oldWidget.toggleThemeMode;
-}
