@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // ← 추가!
 import '/models/todo_entity.dart';
 
 class AddToDoSheet extends StatefulWidget {
@@ -34,14 +35,18 @@ class _AddToDoSheetState extends State<AddToDoSheet> {
 
   bool get _canSave => _titleController.text.trim().isNotEmpty;
 
-  void _save() {
-    if (!_canSave) return;
+  Future<void> _save() async {
+    if (!_canSave) {
+      //null로 응답하고 부모에서 스낵바 띄움
+      Navigator.of(context).pop<ToDoEntity?>(null);
+      return;
+    }
     final todo = ToDoEntity(
       title: _titleController.text.trim(),
       description: _showDescriptionField
-          ? _descController.text.trim().isEmpty
+          ? (_descController.text.trim().isEmpty
               ? null
-              : _descController.text.trim()
+              : _descController.text.trim())
           : null,
       isFavorite: _isFavorite,
       isDone: false,
@@ -52,6 +57,7 @@ class _AddToDoSheetState extends State<AddToDoSheet> {
   @override
   Widget build(BuildContext context) {
     final bottomInsets = MediaQuery.of(context).viewInsets.bottom;
+    final scheme = Theme.of(context).colorScheme;
 
     return Padding(
       padding: EdgeInsets.only(
@@ -65,7 +71,6 @@ class _AddToDoSheetState extends State<AddToDoSheet> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Title 입력
             TextField(
               controller: _titleController,
               focusNode: _titleFocus,
@@ -77,11 +82,10 @@ class _AddToDoSheetState extends State<AddToDoSheet> {
                 focusedBorder: InputBorder.none,
               ),
               onChanged: (_) => setState(() {}),
-              // 줄바꿈 대신 저장
               onSubmitted: (_) => _save(),
               textInputAction: TextInputAction.done,
             ),
-            // description 입력
+
             if (_showDescriptionField) ...[
               SingleChildScrollView(
                 child: TextField(
@@ -92,16 +96,14 @@ class _AddToDoSheetState extends State<AddToDoSheet> {
                     border: InputBorder.none,
                   ),
                   keyboardType: TextInputType.multiline,
-                  maxLines: null, // 줄바꿈 활성화
+                  maxLines: null,
                 ),
               ),
             ],
             const SizedBox(height: 12),
 
-            // 아이콘 2개 + 저장버튼 Row
             Row(
               children: [
-                // 설명(세부정보 추가) 토글
                 if (!_showDescriptionField)
                   IconButton(
                     tooltip: '세부정보 추가',
@@ -111,7 +113,6 @@ class _AddToDoSheetState extends State<AddToDoSheet> {
                     },
                   ),
 
-                // 즐겨찾기 토글
                 IconButton(
                   tooltip: '즐겨찾기',
                   icon: Icon(
@@ -125,13 +126,12 @@ class _AddToDoSheetState extends State<AddToDoSheet> {
 
                 const Spacer(),
 
-                // 저장 버튼 (타이틀이 있을 때만 활성)
                 TextButton(
-                  onPressed: _canSave ? _save : null,
+                  onPressed: _save,
                   style: TextButton.styleFrom(
                     foregroundColor: _canSave
-                        ? Theme.of(context).colorScheme.primary
-                        : Colors.grey,
+                        ? scheme.primary
+                        : scheme.onSurface.withOpacity(0.4),
                     textStyle: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,

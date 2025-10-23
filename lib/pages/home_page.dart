@@ -19,15 +19,41 @@ class _HomePageState extends State<HomePage> {
   final List<ToDoEntity> _todos = [];
   String get _appTitle => "${widget.studentName}'s Tasks";
 
+  // 스낵바
+  void _showToast(String message) {
+    final m = ScaffoldMessenger.of(context);
+    final safeBottom = MediaQuery.of(context).padding.bottom;
+
+    m.hideCurrentSnackBar();
+    m.showSnackBar(
+      SnackBar(
+        content: Text(message),
+        behavior: SnackBarBehavior.floating,
+        margin: EdgeInsets.fromLTRB(12, 12, 12, 12 + safeBottom),
+        duration: const Duration(seconds: 2),
+        dismissDirection: DismissDirection.horizontal,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    );
+  }
+
   Future<void> _openAddSheet() async {
-    final result = await showModalBottomSheet<ToDoEntity>(
+    final result = await showModalBottomSheet<ToDoEntity?>(
       context: context,
       isScrollControlled: true,
+      // useRootNavigator: true, // 필요하면 루트 스캐폴드 기준으로 띄우고 싶을 때 활성화
       builder: (context) => const AddToDoSheet(),
     );
-    if (result != null) {
-      setState(() => _todos.insert(0, result));
+
+    if (!mounted) return;
+
+    // ✅ 시트가 null로 종료되면(빈 제목 등) 여기서 스낵바 표시
+    if (result == null) {
+      _showToast('할 일을 입력해주세요');
+      return;
     }
+
+    setState(() => _todos.insert(0, result));
   }
 
   Future<void> _openDetail(int index) async {
