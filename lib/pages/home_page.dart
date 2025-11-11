@@ -41,13 +41,11 @@ class _HomePageState extends State<HomePage> {
     final result = await showModalBottomSheet<ToDoEntity?>(
       context: context,
       isScrollControlled: true,
-      // useRootNavigator: true, // 필요하면 루트 스캐폴드 기준으로 띄우고 싶을 때 활성화
       builder: (context) => const AddToDoSheet(),
     );
 
     if (!mounted) return;
 
-    // ✅ 시트가 null로 종료되면(빈 제목 등) 여기서 스낵바 표시
     if (result == null) {
       _showToast('할 일을 입력해주세요');
       return;

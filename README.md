@@ -10,7 +10,7 @@ lib/
  │   └─ theme_action.dart     # InheritedWidget: 테마 전환 콜백 전달
  ├─ pages/
  │   ├─ home_page.dart        # 메인 할 일 목록, 바텀시트 열기, 스낵바 표시
- │   └─ todo_detail_page.dart # 상세 페이지 (ColorScheme.fromSeed 기반)
+ │   └─ todo_detail_page.dart # 상세 페이지
  ├─ widgets/
  │   ├─ add_todo_sheet.dart   # 할 일 추가 시트 (제목/세부/즐겨찾기)
  │   ├─ todo_view.dart        # 할 일 카드 UI (완료/즐겨찾기 토글)
