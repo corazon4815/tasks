@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // ← 추가!
-import '/models/todo_entity.dart';
+import '/models/todo_model.dart';
 
 class AddToDoSheet extends StatefulWidget {
   const AddToDoSheet({super.key});
@@ -37,11 +37,10 @@ class _AddToDoSheetState extends State<AddToDoSheet> {
 
   Future<void> _save() async {
     if (!_canSave) {
-      //null로 응답하고 부모에서 스낵바 띄움
-      Navigator.of(context).pop<ToDoEntity?>(null);
+      Navigator.of(context).pop<ToDoModel?>(null);
       return;
     }
-    final todo = ToDoEntity(
+    final todo = ToDoModel(
       title: _titleController.text.trim(),
       description: _showDescriptionField
           ? (_descController.text.trim().isEmpty
@@ -50,8 +49,10 @@ class _AddToDoSheetState extends State<AddToDoSheet> {
           : null,
       isFavorite: _isFavorite,
       isDone: false,
+      createdAt: DateTime.now(),
     );
-    Navigator.of(context).pop<ToDoEntity>(todo);
+    
+    Navigator.of(context).pop<ToDoModel>(todo); //
   }
 
   @override

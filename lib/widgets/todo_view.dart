@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import '/models/todo_entity.dart';
+import '/models/todo_model.dart';
 
 class ToDoView extends StatelessWidget {
-  final ToDoEntity todo;
-  final VoidCallback onToggleDone;      // 외부에서 상태 변경 함수 주입
-  final VoidCallback onToggleFavorite;  // 외부에서 상태 변경 함수 주입
-  final VoidCallback onTap;             // 상세 보기 등 탭 동작
+  final ToDoModel todo;
+  final VoidCallback onToggleDone;
+  final VoidCallback onToggleFavorite;
+  final VoidCallback onTap;
+  final VoidCallback onDelete;
 
   const ToDoView({
     super.key,
@@ -13,6 +14,7 @@ class ToDoView extends StatelessWidget {
     required this.onToggleDone,
     required this.onToggleFavorite,
     required this.onTap,
+    required this.onDelete,
   });
 
   @override
@@ -76,6 +78,12 @@ class ToDoView extends StatelessWidget {
                     icon: Icon(todo.isFavorite ? Icons.star : Icons.star_border),
                     color: favColor,
                     tooltip: todo.isFavorite ? '즐겨찾기 해제' : '즐겨찾기',
+                  ),
+                  IconButton(
+                    onPressed: onDelete,
+                    icon: const Icon(Icons.delete_outline),
+                    color: scheme.onSurfaceVariant,
+                    tooltip: '삭제',
                   ),
                 ],
               ),

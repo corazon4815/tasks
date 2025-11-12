@@ -1,26 +1,22 @@
 import 'package:flutter/material.dart';
-import '/models/todo_entity.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '/models/todo_model.dart';
 import '/widgets/no_todo.dart';
 import '/widgets/todo_view.dart';
 import '/widgets/add_todo_sheet.dart';
 import 'todo_detail_page.dart';
 import '/core/theme_action.dart';
 
-class HomePage extends StatefulWidget {
+import '/presentation/viewmodel/todo_viewmodel.dart';
+
+class HomePage extends ConsumerWidget {
   final String studentName;
 
   const HomePage({super.key, required this.studentName});
+  
+  String get _appTitle => "$studentName's Tasks";
 
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  final List<ToDoEntity> _todos = [];
-  String get _appTitle => "${widget.studentName}'s Tasks";
-
-  // 스낵바
-  void _showToast(String message) {
+  void _showToast(BuildContext context, String message) {
     final m = ScaffoldMessenger.of(context);
     final safeBottom = MediaQuery.of(context).padding.bottom;
 
@@ -37,56 +33,35 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Future<void> _openAddSheet() async {
-    final result = await showModalBottomSheet<ToDoEntity?>(
+  Future<void> _openAddSheet(BuildContext context, WidgetRef ref) async {
+    final result = await showModalBottomSheet<ToDoModel?>(
       context: context,
       isScrollControlled: true,
       builder: (context) => const AddToDoSheet(),
     );
 
-    if (!mounted) return;
-
     if (result == null) {
-      _showToast('할 일을 입력해주세요');
+      _showToast(context, '할 일을 입력해주세요');
       return;
     }
 
-    setState(() => _todos.insert(0, result));
+    await ref.read(todoViewModelProvider.notifier).addTodo(result);
   }
 
-  Future<void> _openDetail(int index) async {
-    final original = _todos[index];
-    final updated = await Navigator.of(context).push<ToDoEntity>(
+  Future<void> _openDetail(BuildContext context, ToDoModel todo) async {
+    await Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => ToDoDetailPage(todo: original),
+        builder: (_) => ToDoDetailPage(todo: todo),
       ),
     );
-
-    if (updated != null) {
-      setState(() {
-        _todos[index] = updated;
-      });
-    }
-  }
-
-  void _toggleDone(int index) {
-    final t = _todos[index];
-    setState(() {
-      _todos[index] = t.copyWith(isDone: !t.isDone);
-    });
-  }
-
-  void _toggleFavorite(int index) {
-    final t = _todos[index];
-    setState(() {
-      _todos[index] = t.copyWith(isFavorite: !t.isFavorite);
-    });
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
+    
+    final todosAsync = ref.watch(todoViewModelProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -106,9 +81,12 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-
-      body: _todos.isEmpty
-          ? LayoutBuilder(
+      body: todosAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (err, stack) => Center(child: Text('Error: $err')),
+        data: (todos) {
+          if (todos.isEmpty) {
+            return LayoutBuilder(
               builder: (context, constraints) => SingleChildScrollView(
                 child: ConstrainedBox(
                   constraints: BoxConstraints(minHeight: constraints.maxHeight),
@@ -121,10 +99,8 @@ class _HomePageState extends State<HomePage> {
                           constraints: const BoxConstraints(maxWidth: 700),
                           child: NoToDo(
                             appBarTitle: _appTitle,
-                            onAddPressed: _openAddSheet,
-                            // ❌ 하드코딩: const Color(0xFFe0e0e0)
-                            // ✅ 카드/표면 계열 색
-                            cardColor: theme.cardColor, // 또는 scheme.surfaceVariant
+                            onAddPressed: () => _openAddSheet(context, ref), // ref 전달
+                            cardColor: theme.cardColor,
                           ),
                         ),
                       ),
@@ -132,23 +108,28 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
               ),
-            )
-          : ListView.builder(
-              padding: const EdgeInsets.all(10),
-              itemCount: _todos.length,
-              itemBuilder: (context, index) {
-                final t = _todos[index];
-                return ToDoView(
-                  todo: t,
-                  onToggleDone: () => _toggleDone(index),
-                  onToggleFavorite: () => _toggleFavorite(index),
-                  onTap: () => _openDetail(index),
-                );
-              },
-            ),
+            );
+          }
+          
+          return ListView.builder(
+            padding: const EdgeInsets.all(10),
+            itemCount: todos.length,
+            itemBuilder: (context, index) {
+              final t = todos[index];
+              return ToDoView(
+                todo: t,
+                onToggleDone: () => ref.read(todoViewModelProvider.notifier).toggleDone(t),
+                onToggleFavorite: () => ref.read(todoViewModelProvider.notifier).toggleFavorite(t),
+                onTap: () => _openDetail(context, t),
+                onDelete: () => ref.read(todoViewModelProvider.notifier).deleteTodo(t), 
+              );
+            },
+          );
+        },
+      ),
 
       floatingActionButton: FloatingActionButton(
-        onPressed: _openAddSheet,
+        onPressed: () => _openAddSheet(context, ref),
         child: const Icon(Icons.add, size: 24),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
