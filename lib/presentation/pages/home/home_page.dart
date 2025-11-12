@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '/models/todo_model.dart';
-import '/widgets/no_todo.dart';
-import '/widgets/todo_view.dart';
-import '/widgets/add_todo_sheet.dart';
-import 'todo_detail_page.dart';
+import 'widgets/no_todo.dart';
+import 'widgets/todo_view.dart';
+import 'widgets/add_todo_sheet.dart';
+import '../todo_detail/todo_detail_page.dart';
 import '/core/theme_action.dart';
 
 import '/presentation/viewmodel/todo_viewmodel.dart';
@@ -58,6 +58,7 @@ class HomePage extends ConsumerWidget {
     } else if (result == false) {
       _showToast(context, '할 일을 입력해주세요');
     }
+    //result == null 일 경우: 사용자가 모달을 닫거나 스와이프했을 때 동작 없음
   }
 
   Future<void> _openDetail(BuildContext context, ToDoModel todo) async {
