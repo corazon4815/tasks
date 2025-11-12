@@ -29,3 +29,14 @@ flutter build apk
 # iOS
 flutter build ios
 ```
+
+### 주요 업데이트: MVVM 아키텍처 및 실시간 데이터 연동
+
+이 프로젝트는 기존의 로컬 상태 관리(StatefulWidget)에서 벗어나, Flutter의 **MVVM(Model-View-ViewModel)** 패턴과 **Riverpod**을 사용하여 리팩토링되었습니다.
+
+| 레이어 | 역할 | 주요 도구 |
+| :--- | :--- | :--- |
+| **View** | 화면 출력 및 사용자 이벤트 처리 | `ConsumerWidget` |
+| **ViewModel** | 비즈니스 로직 및 상태 관리 (CRUD 로직 호출) | `riverpod_generator` |
+| **Repository** | 데이터베이스(Firestore)와의 통신 전담 | `cloud_firestore` |
+| **Model** | 불변 데이터 구조 정의 및 JSON 직렬화 | `freezed` |
