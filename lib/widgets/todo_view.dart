@@ -3,9 +3,13 @@ import '/models/todo_model.dart';
 
 class ToDoView extends StatelessWidget {
   final ToDoModel todo;
+  // [콜백] 완료 상태 토글 요청
   final VoidCallback onToggleDone;
+  // [콜백] 즐겨찾기 상태 토글 요청
   final VoidCallback onToggleFavorite;
+  // [콜백] 상세 페이지 열기 요청
   final VoidCallback onTap;
+  // [콜백] 항목 삭제 요청
   final VoidCallback onDelete;
 
   const ToDoView({
@@ -33,7 +37,7 @@ class ToDoView extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(12),
-          onTap: onTap,
+          onTap: onTap, // 항목 탭 시 상세 보기 요청
           child: DecoratedBox(
             decoration: BoxDecoration(
               color: tileBg,
@@ -79,6 +83,7 @@ class ToDoView extends StatelessWidget {
                     color: favColor,
                     tooltip: todo.isFavorite ? '즐겨찾기 해제' : '즐겨찾기',
                   ),
+                  // 항목 삭제 버튼
                   IconButton(
                     onPressed: onDelete,
                     icon: const Icon(Icons.delete_outline),

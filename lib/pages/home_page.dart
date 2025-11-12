@@ -9,6 +9,10 @@ import '/core/theme_action.dart';
 
 import '/presentation/viewmodel/todo_viewmodel.dart';
 
+/**
+ * MVVM의 View
+ * - 화면 출력, 사용자 입력 받기
+ **/
 class HomePage extends ConsumerWidget {
   final String studentName;
 
@@ -34,18 +38,26 @@ class HomePage extends ConsumerWidget {
   }
 
   Future<void> _openAddSheet(BuildContext context, WidgetRef ref) async {
-    final result = await showModalBottomSheet<ToDoModel?>(
+    final result = await showModalBottomSheet<dynamic>( 
       context: context,
       isScrollControlled: true,
       builder: (context) => const AddToDoSheet(),
     );
 
-    if (result == null) {
-      _showToast(context, '할 일을 입력해주세요');
-      return;
-    }
+    if (!context.mounted) return;
 
-    await ref.read(todoViewModelProvider.notifier).addTodo(result);
+    if (result is ToDoModel) {
+      /**
+       * ref.read (일회성 명령) :
+       * UI를 리빌드하지 않고 ViewModel의 함수만 호출
+       * Riverpod에서 상태를 변경하는 모든 명령은 ref.read로 시작해야 함
+       * 버튼클릭이나 로직함수 내부에서 사용
+       */
+      await ref.read(todoViewModelProvider.notifier).addTodo(result);
+      
+    } else if (result == false) {
+      _showToast(context, '할 일을 입력해주세요');
+    }
   }
 
   Future<void> _openDetail(BuildContext context, ToDoModel todo) async {
@@ -56,11 +68,21 @@ class HomePage extends ConsumerWidget {
     );
   }
 
+  /**
+   * Riverpod : setState()대신 WidgetRef ref
+   * 
+   */
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     
+    /**
+     * ref.watch (데이터 구독) :
+     * todoViewModelProvider의 상태(ToDo 목록)가 Firestore에서 변경될 때마다
+     * ref.watch를 쓰는 HomePage 위젯 전체가 자동으로 리빌드됨(실시간으로 지켜봄)
+     * build 메서드 내부에서 사용
+     */
     final todosAsync = ref.watch(todoViewModelProvider);
 
     return Scaffold(
@@ -81,6 +103,13 @@ class HomePage extends ConsumerWidget {
           ),
         ],
       ),
+      /**
+       * AsyncValue.when (비동기 데이터 처리) :
+       * when 메서드로 
+       * 1.로딩 중에는 CircularProgressIndicator를
+       * 2.에러 발생 시에는 에러 메시지를 
+       * 3.데이터가 도착하면 목록을 보여주도록 분기 처리 가능
+       */
       body: todosAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, stack) => Center(child: Text('Error: $err')),
@@ -99,6 +128,7 @@ class HomePage extends ConsumerWidget {
                           constraints: const BoxConstraints(maxWidth: 700),
                           child: NoToDo(
                             appBarTitle: _appTitle,
+                            //할 일 추가 시트 열기
                             onAddPressed: () => _openAddSheet(context, ref), // ref 전달
                             cardColor: theme.cardColor,
                           ),
@@ -118,16 +148,20 @@ class HomePage extends ConsumerWidget {
               final t = todos[index];
               return ToDoView(
                 todo: t,
+                //완료 상태 토글
                 onToggleDone: () => ref.read(todoViewModelProvider.notifier).toggleDone(t),
+                //즐겨찾기 상태 토글
                 onToggleFavorite: () => ref.read(todoViewModelProvider.notifier).toggleFavorite(t),
+                //상세 보기 페이지 열기
                 onTap: () => _openDetail(context, t),
+                //ToDo 삭제
                 onDelete: () => ref.read(todoViewModelProvider.notifier).deleteTodo(t), 
               );
             },
           );
         },
       ),
-
+      //할 일 추가 시트 열기
       floatingActionButton: FloatingActionButton(
         onPressed: () => _openAddSheet(context, ref),
         child: const Icon(Icons.add, size: 24),

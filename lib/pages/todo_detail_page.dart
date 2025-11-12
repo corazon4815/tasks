@@ -3,6 +3,11 @@ import '/models/todo_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '/presentation/viewmodel/todo_viewmodel.dart';
 
+/**
+ * MVVM의 View
+ * - 화면 출력, 사용자 입력 받기
+ * - Riverpod을 구독하여 데이터의 최신 상태를 반영
+ **/
 class ToDoDetailPage extends ConsumerWidget {
   final ToDoModel todo;
   const ToDoDetailPage({super.key, required this.todo});
@@ -12,10 +17,15 @@ class ToDoDetailPage extends ConsumerWidget {
     const colorSeed = Color(0xFF6750A4);
     final base = Theme.of(context);
     
+    /**
+     * [데이터 구독] ViewModel의 스트림을 구독하여 현재 ToDo의 최신 상태를 추적
+     * 목록에서 넘어온 todo가 아닌 DB의 최신 데이터를 currentTodo로 사용
+     */
     final currentTodoAsync = ref.watch(todoViewModelProvider).when(
       loading: () => todo,
       error: (err, stack) => todo,
       data: (todos) {
+        // ID를 기준으로 데이터 반환
         return todos.firstWhere(
           (t) => t.id == todo.id,
           orElse: () => todo,
@@ -23,6 +33,7 @@ class ToDoDetailPage extends ConsumerWidget {
       },
     );
     
+    // UI 렌더링을 위해 최신 데이터를 사용
     final currentTodo = currentTodoAsync; 
     
     final scheme = ColorScheme.fromSeed(
@@ -41,9 +52,11 @@ class ToDoDetailPage extends ConsumerWidget {
           appBar: AppBar(
             leading: IconButton(
               icon: const Icon(Icons.arrow_back),
+              // 이전 화면으로 돌아가기
               onPressed: () => Navigator.of(context).pop(),
             ),
             actions: [
+              // 즐겨찾기 상태 토글
               IconButton(
                 onPressed: () => ref.read(todoViewModelProvider.notifier).toggleFavorite(currentTodo),
                 icon: Icon(
@@ -52,6 +65,7 @@ class ToDoDetailPage extends ConsumerWidget {
                 color: currentTodo.isFavorite ? scheme.secondary : scheme.onSurface,
                 tooltip: '즐겨찾기',
               ),
+              // 완료/미완료 상태 토글
               IconButton(
                 onPressed: () => ref.read(todoViewModelProvider.notifier).toggleDone(currentTodo),
                 icon: Icon(
@@ -73,6 +87,7 @@ class ToDoDetailPage extends ConsumerWidget {
                         currentTodo.title,
                         style: base.textTheme.headlineSmall?.copyWith(
                           fontWeight: FontWeight.bold,
+                          // 완료 상태에 따라 취소선
                           decoration:
                               currentTodo.isDone ? TextDecoration.lineThrough : null,
                         ),

@@ -5,6 +5,11 @@ import 'package:tasks/models/todo_model.dart';
 
 part 'todo_viewmodel.g.dart';
 
+/**
+ * MVVM의 ViewModel
+ * - 로직 및 데이터 관리
+ * - View의 명령을 받고 Model 조작
+ **/
 @riverpod
 class TodoViewModel extends _$TodoViewModel {
   late final ToDoRepository _repository;

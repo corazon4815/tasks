@@ -37,7 +37,7 @@ class _AddToDoSheetState extends State<AddToDoSheet> {
 
   Future<void> _save() async {
     if (!_canSave) {
-      Navigator.of(context).pop<ToDoModel?>(null);
+      Navigator.of(context).pop<bool>(false);
       return;
     }
     final todo = ToDoModel(
@@ -52,7 +52,7 @@ class _AddToDoSheetState extends State<AddToDoSheet> {
       createdAt: DateTime.now(),
     );
     
-    Navigator.of(context).pop<ToDoModel>(todo); //
+    Navigator.of(context).pop<ToDoModel>(todo);
   }
 
   @override
