@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '/models/todo_model.dart';
+import '/domain/entities/todo_entity.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '/presentation/viewmodel/todo_viewmodel.dart';
 
@@ -9,7 +9,7 @@ import '/presentation/viewmodel/todo_viewmodel.dart';
  * - Riverpod을 구독하여 데이터의 최신 상태를 반영
  **/
 class ToDoDetailPage extends ConsumerWidget {
-  final ToDoModel todo;
+  final TodoEntity todo;
   const ToDoDetailPage({super.key, required this.todo});
 
   @override

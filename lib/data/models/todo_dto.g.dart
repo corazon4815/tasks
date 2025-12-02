@@ -1,13 +1,13 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'todo_model.dart';
+part of 'todo_dto.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$ToDoModelImpl _$$ToDoModelImplFromJson(Map<String, dynamic> json) =>
-    _$ToDoModelImpl(
+_$TodoDtoImpl _$$TodoDtoImplFromJson(Map<String, dynamic> json) =>
+    _$TodoDtoImpl(
       id: json['id'] as String?,
       title: json['title'] as String,
       isDone: json['isDone'] as bool? ?? false,
@@ -17,7 +17,7 @@ _$ToDoModelImpl _$$ToDoModelImplFromJson(Map<String, dynamic> json) =>
           const TimestampConverter().fromJson(json['createdAt'] as Timestamp),
     );
 
-Map<String, dynamic> _$$ToDoModelImplToJson(_$ToDoModelImpl instance) =>
+Map<String, dynamic> _$$TodoDtoImplToJson(_$TodoDtoImpl instance) =>
     <String, dynamic>{
       'id': instance.id,
       'title': instance.title,

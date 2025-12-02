@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // ← 추가!
-import '/models/todo_model.dart';
+import '/domain/entities/todo_entity.dart';
 
 class AddToDoSheet extends StatefulWidget {
   const AddToDoSheet({super.key});
@@ -40,7 +39,7 @@ class _AddToDoSheetState extends State<AddToDoSheet> {
       Navigator.of(context).pop<bool>(false);
       return;
     }
-    final todo = ToDoModel(
+    final todo = TodoEntity(
       title: _titleController.text.trim(),
       description: _showDescriptionField
           ? (_descController.text.trim().isEmpty
@@ -52,7 +51,7 @@ class _AddToDoSheetState extends State<AddToDoSheet> {
       createdAt: DateTime.now(),
     );
     
-    Navigator.of(context).pop<ToDoModel>(todo);
+    Navigator.of(context).pop<TodoEntity>(todo);
   }
 
   @override
@@ -132,7 +131,7 @@ class _AddToDoSheetState extends State<AddToDoSheet> {
                   style: TextButton.styleFrom(
                     foregroundColor: _canSave
                         ? scheme.primary
-                        : scheme.onSurface.withOpacity(0.4),
+                        : scheme.onSurface.withValues(alpha: 0.4),
                     textStyle: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,

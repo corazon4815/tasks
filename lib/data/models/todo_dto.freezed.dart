@@ -3,7 +3,7 @@
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of 'todo_model.dart';
+part of 'todo_dto.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -14,13 +14,13 @@ T _$identity<T>(T value) => value;
 final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
-ToDoModel _$ToDoModelFromJson(Map<String, dynamic> json) {
-  return _ToDoModel.fromJson(json);
+TodoDto _$TodoDtoFromJson(Map<String, dynamic> json) {
+  return _TodoDto.fromJson(json);
 }
 
 /// @nodoc
-mixin _$ToDoModel {
-  String? get id => throw _privateConstructorUsedError; // Firestore 문서 ID
+mixin _$TodoDto {
+  String? get id => throw _privateConstructorUsedError;
   String get title => throw _privateConstructorUsedError;
   bool get isDone => throw _privateConstructorUsedError;
   bool get isFavorite => throw _privateConstructorUsedError;
@@ -28,20 +28,19 @@ mixin _$ToDoModel {
   @TimestampConverter()
   DateTime get createdAt => throw _privateConstructorUsedError;
 
-  /// Serializes this ToDoModel to a JSON map.
+  /// Serializes this TodoDto to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 
-  /// Create a copy of ToDoModel
+  /// Create a copy of TodoDto
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $ToDoModelCopyWith<ToDoModel> get copyWith =>
-      throw _privateConstructorUsedError;
+  $TodoDtoCopyWith<TodoDto> get copyWith => throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class $ToDoModelCopyWith<$Res> {
-  factory $ToDoModelCopyWith(ToDoModel value, $Res Function(ToDoModel) then) =
-      _$ToDoModelCopyWithImpl<$Res, ToDoModel>;
+abstract class $TodoDtoCopyWith<$Res> {
+  factory $TodoDtoCopyWith(TodoDto value, $Res Function(TodoDto) then) =
+      _$TodoDtoCopyWithImpl<$Res, TodoDto>;
   @useResult
   $Res call(
       {String? id,
@@ -53,16 +52,16 @@ abstract class $ToDoModelCopyWith<$Res> {
 }
 
 /// @nodoc
-class _$ToDoModelCopyWithImpl<$Res, $Val extends ToDoModel>
-    implements $ToDoModelCopyWith<$Res> {
-  _$ToDoModelCopyWithImpl(this._value, this._then);
+class _$TodoDtoCopyWithImpl<$Res, $Val extends TodoDto>
+    implements $TodoDtoCopyWith<$Res> {
+  _$TodoDtoCopyWithImpl(this._value, this._then);
 
   // ignore: unused_field
   final $Val _value;
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of ToDoModel
+  /// Create a copy of TodoDto
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
@@ -104,11 +103,10 @@ class _$ToDoModelCopyWithImpl<$Res, $Val extends ToDoModel>
 }
 
 /// @nodoc
-abstract class _$$ToDoModelImplCopyWith<$Res>
-    implements $ToDoModelCopyWith<$Res> {
-  factory _$$ToDoModelImplCopyWith(
-          _$ToDoModelImpl value, $Res Function(_$ToDoModelImpl) then) =
-      __$$ToDoModelImplCopyWithImpl<$Res>;
+abstract class _$$TodoDtoImplCopyWith<$Res> implements $TodoDtoCopyWith<$Res> {
+  factory _$$TodoDtoImplCopyWith(
+          _$TodoDtoImpl value, $Res Function(_$TodoDtoImpl) then) =
+      __$$TodoDtoImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call(
@@ -121,14 +119,14 @@ abstract class _$$ToDoModelImplCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$ToDoModelImplCopyWithImpl<$Res>
-    extends _$ToDoModelCopyWithImpl<$Res, _$ToDoModelImpl>
-    implements _$$ToDoModelImplCopyWith<$Res> {
-  __$$ToDoModelImplCopyWithImpl(
-      _$ToDoModelImpl _value, $Res Function(_$ToDoModelImpl) _then)
+class __$$TodoDtoImplCopyWithImpl<$Res>
+    extends _$TodoDtoCopyWithImpl<$Res, _$TodoDtoImpl>
+    implements _$$TodoDtoImplCopyWith<$Res> {
+  __$$TodoDtoImplCopyWithImpl(
+      _$TodoDtoImpl _value, $Res Function(_$TodoDtoImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of ToDoModel
+  /// Create a copy of TodoDto
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
@@ -140,7 +138,7 @@ class __$$ToDoModelImplCopyWithImpl<$Res>
     Object? description = freezed,
     Object? createdAt = null,
   }) {
-    return _then(_$ToDoModelImpl(
+    return _then(_$TodoDtoImpl(
       id: freezed == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
@@ -170,23 +168,22 @@ class __$$ToDoModelImplCopyWithImpl<$Res>
 }
 
 /// @nodoc
-
-@JsonSerializable(explicitToJson: true)
-class _$ToDoModelImpl implements _ToDoModel {
-  const _$ToDoModelImpl(
+@JsonSerializable()
+class _$TodoDtoImpl extends _TodoDto {
+  const _$TodoDtoImpl(
       {this.id,
       required this.title,
       this.isDone = false,
       this.isFavorite = false,
       this.description,
-      @TimestampConverter() required this.createdAt});
+      @TimestampConverter() required this.createdAt})
+      : super._();
 
-  factory _$ToDoModelImpl.fromJson(Map<String, dynamic> json) =>
-      _$$ToDoModelImplFromJson(json);
+  factory _$TodoDtoImpl.fromJson(Map<String, dynamic> json) =>
+      _$$TodoDtoImplFromJson(json);
 
   @override
   final String? id;
-// Firestore 문서 ID
   @override
   final String title;
   @override
@@ -203,14 +200,14 @@ class _$ToDoModelImpl implements _ToDoModel {
 
   @override
   String toString() {
-    return 'ToDoModel(id: $id, title: $title, isDone: $isDone, isFavorite: $isFavorite, description: $description, createdAt: $createdAt)';
+    return 'TodoDto(id: $id, title: $title, isDone: $isDone, isFavorite: $isFavorite, description: $description, createdAt: $createdAt)';
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$ToDoModelImpl &&
+            other is _$TodoDtoImpl &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.title, title) || other.title == title) &&
             (identical(other.isDone, isDone) || other.isDone == isDone) &&
@@ -227,37 +224,36 @@ class _$ToDoModelImpl implements _ToDoModel {
   int get hashCode => Object.hash(
       runtimeType, id, title, isDone, isFavorite, description, createdAt);
 
-  /// Create a copy of ToDoModel
+  /// Create a copy of TodoDto
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
-  _$$ToDoModelImplCopyWith<_$ToDoModelImpl> get copyWith =>
-      __$$ToDoModelImplCopyWithImpl<_$ToDoModelImpl>(this, _$identity);
+  _$$TodoDtoImplCopyWith<_$TodoDtoImpl> get copyWith =>
+      __$$TodoDtoImplCopyWithImpl<_$TodoDtoImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$ToDoModelImplToJson(
+    return _$$TodoDtoImplToJson(
       this,
     );
   }
 }
 
-abstract class _ToDoModel implements ToDoModel {
-  const factory _ToDoModel(
-          {final String? id,
-          required final String title,
-          final bool isDone,
-          final bool isFavorite,
-          final String? description,
-          @TimestampConverter() required final DateTime createdAt}) =
-      _$ToDoModelImpl;
+abstract class _TodoDto extends TodoDto {
+  const factory _TodoDto(
+      {final String? id,
+      required final String title,
+      final bool isDone,
+      final bool isFavorite,
+      final String? description,
+      @TimestampConverter() required final DateTime createdAt}) = _$TodoDtoImpl;
+  const _TodoDto._() : super._();
 
-  factory _ToDoModel.fromJson(Map<String, dynamic> json) =
-      _$ToDoModelImpl.fromJson;
+  factory _TodoDto.fromJson(Map<String, dynamic> json) = _$TodoDtoImpl.fromJson;
 
   @override
-  String? get id; // Firestore 문서 ID
+  String? get id;
   @override
   String get title;
   @override
@@ -270,10 +266,10 @@ abstract class _ToDoModel implements ToDoModel {
   @TimestampConverter()
   DateTime get createdAt;
 
-  /// Create a copy of ToDoModel
+  /// Create a copy of TodoDto
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$ToDoModelImplCopyWith<_$ToDoModelImpl> get copyWith =>
+  _$$TodoDtoImplCopyWith<_$TodoDtoImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

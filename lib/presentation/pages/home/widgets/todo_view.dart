@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '/models/todo_model.dart';
+import '/domain/entities/todo_entity.dart';
 
 class ToDoView extends StatelessWidget {
-  final ToDoModel todo;
+  final TodoEntity todo;
   // [콜백] 완료 상태 토글 요청
   final VoidCallback onToggleDone;
   // [콜백] 즐겨찾기 상태 토글 요청

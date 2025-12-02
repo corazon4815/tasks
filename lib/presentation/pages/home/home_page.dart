@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '/models/todo_model.dart';
+import '/domain/entities/todo_entity.dart';
 import 'widgets/no_todo.dart';
 import 'widgets/todo_view.dart';
 import 'widgets/add_todo_sheet.dart';
 import '../todo_detail/todo_detail_page.dart';
-import '/core/theme_action.dart';
+import '/core/theme_provider.dart';
 
 import '/presentation/viewmodel/todo_viewmodel.dart';
 
 /**
- * MVVM의 View
+ * Clean Architecture - View
  * - 화면 출력, 사용자 입력 받기
+ * - Domain의 Entity 사용
  **/
 class HomePage extends ConsumerWidget {
   final String studentName;
@@ -46,7 +47,7 @@ class HomePage extends ConsumerWidget {
 
     if (!context.mounted) return;
 
-    if (result is ToDoModel) {
+    if (result is TodoEntity) {
       /**
        * ref.read (일회성 명령) :
        * UI를 리빌드하지 않고 ViewModel의 함수만 호출
@@ -61,7 +62,7 @@ class HomePage extends ConsumerWidget {
     //result == null 일 경우: 사용자가 모달을 닫거나 스와이프했을 때 동작 없음
   }
 
-  Future<void> _openDetail(BuildContext context, ToDoModel todo) async {
+  Future<void> _openDetail(BuildContext context, TodoEntity todo) async {
     await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => ToDoDetailPage(todo: todo),
@@ -76,7 +77,6 @@ class HomePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final scheme = theme.colorScheme;
     
     /**
      * ref.watch (데이터 구독) :
@@ -100,7 +100,7 @@ class HomePage extends ConsumerWidget {
                   ? Icons.light_mode
                   : Icons.dark_mode,
             ),
-            onPressed: () => ThemeAction.of(context)?.toggleThemeMode?.call(),
+            onPressed: () => ref.read(themeModeNotifierProvider.notifier).toggle(),
           ),
         ],
       ),
