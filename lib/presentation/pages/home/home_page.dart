@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '/domain/entities/todo_entity.dart';
 import 'widgets/no_todo.dart';
@@ -63,11 +64,7 @@ class HomePage extends ConsumerWidget {
   }
 
   Future<void> _openDetail(BuildContext context, TodoEntity todo) async {
-    await Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => ToDoDetailPage(todo: todo),
-      ),
-    );
+    context.push('/detail', extra: todo);
   }
 
   /**

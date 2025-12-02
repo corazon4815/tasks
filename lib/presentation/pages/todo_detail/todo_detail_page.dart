@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '/domain/entities/todo_entity.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '/presentation/viewmodel/todo_viewmodel.dart';
 
 /**
- * MVVM의 View
+ * Clean Architecture - View
  * - 화면 출력, 사용자 입력 받기
  * - Riverpod을 구독하여 데이터의 최신 상태를 반영
  **/
@@ -53,7 +54,7 @@ class ToDoDetailPage extends ConsumerWidget {
             leading: IconButton(
               icon: const Icon(Icons.arrow_back),
               // 이전 화면으로 돌아가기
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () => context.pop(),
             ),
             actions: [
               // 즐겨찾기 상태 토글

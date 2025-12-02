@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tasks/core/app_theme.dart';
 import 'package:tasks/core/theme_provider.dart';
-import 'presentation/pages/home/home_page.dart';
+import 'package:tasks/core/router_provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -29,14 +29,15 @@ class TasksApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeModeNotifierProvider);
+    final router = ref.watch(routerProvider);
 
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'tasks',
       debugShowCheckedModeBanner: false,
       themeMode: themeMode,
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
-      home: const HomePage(studentName: '수진'),
+      routerConfig: router,
     );
   }
 }

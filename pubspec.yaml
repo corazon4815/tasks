@@ -25,6 +25,8 @@ dependencies:
   # Freezed (annotation만 의존)
   freezed_annotation: ^2.4.4
   
+  go_router: ^17.0.0
+  
 
 dev_dependencies:
   flutter_test:
