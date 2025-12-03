@@ -15,7 +15,6 @@ dependencies:
   # Firebase 필수 패키지
   firebase_core: ^4.1.0
   cloud_firestore: ^6.0.1
-  google_sign_in: ^6.0.0
   firebase_auth: ^6.0.2
 
   # Riverpod
@@ -26,6 +25,8 @@ dependencies:
   freezed_annotation: ^2.4.4
   
   go_router: ^17.0.0
+
+  tap_debouncer: ^2.2.0
   
 
 dev_dependencies:

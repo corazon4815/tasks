@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tap_debouncer/tap_debouncer.dart';
 import '/domain/entities/todo_entity.dart';
 import 'widgets/no_todo.dart';
 import 'widgets/todo_view.dart';
 import 'widgets/add_todo_sheet.dart';
-import '../todo_detail/todo_detail_page.dart';
 import '/core/theme_provider.dart';
 
 import '/presentation/viewmodel/todo_viewmodel.dart';
@@ -160,9 +160,15 @@ class HomePage extends ConsumerWidget {
         },
       ),
       //할 일 추가 시트 열기
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _openAddSheet(context, ref),
-        child: const Icon(Icons.add, size: 24),
+      floatingActionButton: TapDebouncer(
+        onTap: () => _openAddSheet(context, ref),
+        cooldown: const Duration(milliseconds: 800),
+        builder: (BuildContext context, TapDebouncerFunc? onTap) {
+          return FloatingActionButton(
+            onPressed: onTap, // 디바운서가 관리하는 onTap
+            child: const Icon(Icons.add, size: 24),
+          );
+        },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
