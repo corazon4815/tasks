@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../../domain/entities/todo_entity.dart';
 import '../../domain/repositories/todo_repository.dart';
 import '../datasources/todo_remote_datasource.dart';
@@ -12,13 +14,18 @@ class TodoRepositoryImpl implements TodoRepository {
   final TodoRemoteDataSource _remoteDataSource;
 
   TodoRepositoryImpl(this._remoteDataSource);
-
+  
   @override
-  Stream<List<TodoEntity>> getTodos() {
-    // DataSource에서 DTO Stream을 받아 Entity Stream으로 변환
-    return _remoteDataSource.getTodos().map(
-          (dtoList) => dtoList.map((dto) => dto.toEntity()).toList(),
-        );
+  Future<List<TodoEntity>> getTodos({
+    DateTime? startAfter,
+    int limit = 15,
+  }) async {
+    final dtoList = await _remoteDataSource.getTodos(
+      startAfter: startAfter,
+      limit: limit,
+    );
+
+    return dtoList.map((dto) => dto.toEntity()).toList();
   }
 
   @override

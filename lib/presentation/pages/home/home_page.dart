@@ -49,39 +49,21 @@ class HomePage extends ConsumerWidget {
     if (!context.mounted) return;
 
     if (result is TodoEntity) {
-      /**
-       * ref.read (일회성 명령) :
-       * UI를 리빌드하지 않고 ViewModel의 함수만 호출
-       * Riverpod에서 상태를 변경하는 모든 명령은 ref.read로 시작해야 함
-       * 버튼클릭이나 로직함수 내부에서 사용
-       */
       await ref.read(todoViewModelProvider.notifier).addTodo(result);
-      
     } else if (result == false) {
       _showToast(context, '할 일을 입력해주세요');
     }
-    //result == null 일 경우: 사용자가 모달을 닫거나 스와이프했을 때 동작 없음
   }
 
   Future<void> _openDetail(BuildContext context, TodoEntity todo) async {
     context.push('/detail', extra: todo);
   }
 
-  /**
-   * Riverpod : setState()대신 WidgetRef ref
-   * 
-   */
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    
-    /**
-     * ref.watch (데이터 구독) :
-     * todoViewModelProvider의 상태(ToDo 목록)가 Firestore에서 변경될 때마다
-     * ref.watch를 쓰는 HomePage 위젯 전체가 자동으로 리빌드됨(실시간으로 지켜봄)
-     * build 메서드 내부에서 사용
-     */
     final todosAsync = ref.watch(todoViewModelProvider);
+    final vm = ref.read(todoViewModelProvider.notifier);
 
     return Scaffold(
       appBar: AppBar(
@@ -101,34 +83,31 @@ class HomePage extends ConsumerWidget {
           ),
         ],
       ),
-      /**
-       * AsyncValue.when (비동기 데이터 처리) :
-       * when 메서드로 
-       * 1.로딩 중에는 CircularProgressIndicator를
-       * 2.에러 발생 시에는 에러 메시지를 
-       * 3.데이터가 도착하면 목록을 보여주도록 분기 처리 가능
-       */
       body: todosAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, stack) => Center(child: Text('Error: $err')),
         data: (todos) {
+          // ✅ 1) 비어 있을 때 화면 (그대로 유지)
           if (todos.isEmpty) {
-            return LayoutBuilder(
-              builder: (context, constraints) => SingleChildScrollView(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                  child: SafeArea(
-                    child: Align(
-                      alignment: Alignment.topCenter,
-                      child: Padding(
-                        padding: const EdgeInsets.all(5),
-                        child: ConstrainedBox(
-                          constraints: const BoxConstraints(maxWidth: 700),
-                          child: NoToDo(
-                            appBarTitle: _appTitle,
-                            //할 일 추가 시트 열기
-                            onAddPressed: () => _openAddSheet(context, ref), // ref 전달
-                            cardColor: theme.cardColor,
+            return RefreshIndicator(
+              onRefresh: () => vm.refresh(),
+              child: LayoutBuilder(
+                builder: (context, constraints) => SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                    child: SafeArea(
+                      child: Align(
+                        alignment: Alignment.topCenter,
+                        child: Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 700),
+                            child: NoToDo(
+                              appBarTitle: _appTitle,
+                              onAddPressed: () => _openAddSheet(context, ref),
+                              cardColor: theme.cardColor,
+                            ),
                           ),
                         ),
                       ),
@@ -138,34 +117,61 @@ class HomePage extends ConsumerWidget {
               ),
             );
           }
-          
-          return ListView.builder(
-            padding: const EdgeInsets.all(10),
-            itemCount: todos.length,
-            itemBuilder: (context, index) {
-              final t = todos[index];
-              return ToDoView(
-                todo: t,
-                //완료 상태 토글
-                onToggleDone: () => ref.read(todoViewModelProvider.notifier).toggleDone(t),
-                //즐겨찾기 상태 토글
-                onToggleFavorite: () => ref.read(todoViewModelProvider.notifier).toggleFavorite(t),
-                //상세 보기 페이지 열기
-                onTap: () => _openDetail(context, t),
-                //ToDo 삭제
-                onDelete: () => ref.read(todoViewModelProvider.notifier).deleteTodo(t), 
-              );
-            },
+
+          // ✅ 2) 리스트 있을 때: Pull to Refresh + Infinite Scroll
+          final hasMore = vm.hasMore;
+          final isLoadingMore = vm.isLoadingMore;
+
+          return RefreshIndicator(
+            onRefresh: () => vm.refresh(),
+            child: NotificationListener<ScrollNotification>(
+              onNotification: (ScrollNotification scrollInfo) {
+                // 리스트 맨 아래 근처까지 스크롤되면 loadMore 호출
+                if (scrollInfo.metrics.pixels >=
+                        scrollInfo.metrics.maxScrollExtent - 100 &&
+                    hasMore &&
+                    !isLoadingMore) {
+                  vm.loadMore();
+                }
+                return false;
+              },
+              child: ListView.builder(
+                padding: const EdgeInsets.all(10),
+                itemCount: todos.length + (hasMore ? 1 : 0), 
+                itemBuilder: (context, index) {
+                  // 마지막 한 칸은 "로딩중 인디케이터" 슬롯
+                  if (index == todos.length) {
+                    return const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                      child: Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    );
+                  }
+
+                  final t = todos[index];
+                  return ToDoView(
+                    todo: t,
+                    onToggleDone: () =>
+                        ref.read(todoViewModelProvider.notifier).toggleDone(t),
+                    onToggleFavorite: () =>
+                        ref.read(todoViewModelProvider.notifier).toggleFavorite(t),
+                    onTap: () => _openDetail(context, t),
+                    onDelete: () =>
+                        ref.read(todoViewModelProvider.notifier).deleteTodo(t),
+                  );
+                },
+              ),
+            ),
           );
         },
       ),
-      //할 일 추가 시트 열기
       floatingActionButton: TapDebouncer(
         onTap: () => _openAddSheet(context, ref),
         cooldown: const Duration(milliseconds: 800),
         builder: (BuildContext context, TapDebouncerFunc? onTap) {
           return FloatingActionButton(
-            onPressed: onTap, // 디바운서가 관리하는 onTap
+            onPressed: onTap,
             child: const Icon(Icons.add, size: 24),
           );
         },

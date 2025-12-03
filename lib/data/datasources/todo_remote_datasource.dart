@@ -16,16 +16,32 @@ class TodoRemoteDataSource {
   CollectionReference<Map<String, dynamic>> get _collection =>
       _firestore.collection(_collectionPath);
 
-  /// Todo 목록을 실시간으로 가져오는 Stream (DTO 반환)
-  Stream<List<TodoDto>> getTodos() {
-    return _collection
+  /// Todo 목록을 페이지네이션으로 가져옴
+  /// 
+  /// - createdAt 기준 내림차순(최신 순)
+  /// - [startAfter] 가 있으면, 그 DateTime 보다 과거 데이터부터 조회
+  /// - [limit] 개수만큼만 가져옴
+  Future<List<TodoDto>> getTodos({
+    DateTime? startAfter,
+    int limit = 15,
+  }) async {
+    Query<Map<String, dynamic>> query = _collection
         .orderBy('createdAt', descending: true)
-        .snapshots()
-        .map((snapshot) {
-      return snapshot.docs
-          .map((doc) => TodoDto.fromFirestore(doc))
-          .toList();
-    });
+        .limit(limit);
+
+    if (startAfter != null) {
+      // startAfter 보다 이전 데이터만 가져오도록
+      query = query.where(
+        'createdAt',
+        isLessThan: Timestamp.fromDate(startAfter),
+      );
+    }
+
+    final snapshot = await query.get();
+
+    return snapshot.docs
+        .map((doc) => TodoDto.fromFirestore(doc))
+        .toList();
   }
 
   /// 새로운 Todo 추가

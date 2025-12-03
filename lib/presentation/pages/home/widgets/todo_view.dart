@@ -84,16 +84,22 @@ class ToDoView extends StatelessWidget {
 
                       // 제목
                       Expanded(
-                        child: Text(
-                          todo.title,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            color: scheme.onSurface,
-                            decoration: todo.isDone
-                                ? TextDecoration.lineThrough
-                                : null,
-                            decorationThickness: 2,
+                        child: Hero(
+                          tag: todo.id ?? todo.title, // 같은 tag를 Detail에서도 써야 함
+                          child: Material(
+                            color: Colors.transparent,
+                            child: Text(
+                              todo.title,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                color: scheme.onSurface,
+                                decoration: todo.isDone
+                                    ? TextDecoration.lineThrough
+                                    : null,
+                                decorationThickness: 2,
+                              ),
+                            ),
                           ),
                         ),
                       ),

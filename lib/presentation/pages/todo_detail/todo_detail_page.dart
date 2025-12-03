@@ -84,13 +84,18 @@ class ToDoDetailPage extends ConsumerWidget {
                 Row(
                   children: [
                     Expanded(
-                      child: Text(
-                        currentTodo.title,
-                        style: base.textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          // 완료 상태에 따라 취소선
-                          decoration:
-                              currentTodo.isDone ? TextDecoration.lineThrough : null,
+                      child: Hero(
+                        tag: currentTodo.id ?? currentTodo.title, // 리스트와 같은 태그
+                        child: Material(
+                          color: Colors.transparent,
+                          child: Text(
+                            currentTodo.title,
+                            style: base.textTheme.headlineSmall?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              decoration:
+                                  currentTodo.isDone ? TextDecoration.lineThrough : null,
+                            ),
+                          ),
                         ),
                       ),
                     ),
